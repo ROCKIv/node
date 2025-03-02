@@ -52,11 +52,11 @@ async function scrape17track(trackingNumber) {
     const url = `https://t.17track.net/es#nums=${trackingNumber}`;
     await page.goto(url, {
         waitUntil: 'networkidle2',
-        timeout: 60000
+        timeout: 260000
     });
 
     console.log("Forzando recarga de datos...");
-    await page.reload({ waitUntil: 'networkidle2', timeout: 60000 });
+    await page.reload({ waitUntil: 'networkidle2', timeout: 260000 });
 
     const pageTitle = await page.title();
     console.log("Título de la página:", pageTitle);
@@ -69,8 +69,8 @@ async function scrape17track(trackingNumber) {
 
     console.log("Esperando el contenedor de rastreo...");
     try {
-        await page.waitForSelector('.track-container, .tracklist-item', { timeout: 30000 });
-        await page.waitForSelector('.trn-block', { timeout: 30000 });
+        await page.waitForSelector('.track-container, .tracklist-item', { timeout: 230000 });
+        await page.waitForSelector('.trn-block', { timeout: 230000 });
     } catch (error) {
         console.error("Error esperando selectores:", error);
         await browser.close();

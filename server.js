@@ -3,13 +3,16 @@ const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const cors = require('cors');
 const app = express();
-const port = 3000;
+
+// Usar el puerto de la variable de entorno PORT (Render lo asigna como 8080) o 3000 como fallback
+const port = process.env.PORT || 3000;
 
 puppeteer.use(StealthPlugin()); // Activar el modo stealth
 
 app.use(express.json());
 app.use(cors());
 
+// Endpoint POST /track
 app.post('/track', async (req, res) => {
     const { trackingNumber } = req.body;
 
@@ -22,15 +25,24 @@ app.post('/track', async (req, res) => {
         console.log("Enviando datos al frontend:", data);
         res.json(data);
     } catch (error) {
+        console.error("Error en /track:", error);
         res.status(500).json({ error: error.message });
     }
 });
 
+// Función para hacer scraping en 17track
 async function scrape17track(trackingNumber) {
     console.log("Lanzando Puppeteer con Stealth...");
     const browser = await puppeteer.launch({
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-cache']
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage', // Optimiza memoria en Render
+            '--disable-cache',
+            '--single-process', // Reduce uso de recursos
+            '--no-zygote' // Reduce overhead en contenedores
+        ]
     });
     const page = await browser.newPage();
 
@@ -88,6 +100,12 @@ async function scrape17track(trackingNumber) {
     return data;
 }
 
+// Endpoint básico para verificar que el servidor está vivo
+app.get('/health', (req, res) => {
+    res.status(200).send('OK');
+});
+
+// Escuchar en el puerto asignado por Render
 app.listen(port, () => {
-    console.log(`Backend corriendo en http://localhost:${port}`);
+    console.log(`Backend corriendo en puerto ${port}`);
 });

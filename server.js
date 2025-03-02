@@ -70,7 +70,7 @@ async function scrape17track(trackingNumber) {
     console.log("Esperando el contenedor de rastreo...");
     try {
         await page.waitForSelector('.track-container, .tracklist-item', { timeout: 30000 });
-        await page.waitForSelector('.trn-block', { timeout: 10000 });
+        await page.waitForSelector('.trn-block', { timeout: 30000 });
     } catch (error) {
         console.error("Error esperando selectores:", error);
         await browser.close();
